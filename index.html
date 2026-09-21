@@ -147,12 +147,13 @@ cakeImg.src = 'asset/cake.png';
       ctx.fillRect(p.x, p.y, p.w, p.h);
     }
 
-    ctx.fillStyle = '#FFD700';
+    ctx.font = '20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
     for (let c of coins) {
       if (!c.collected) {
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillText('🎂', c.x, c.y);
       }
     }
 
