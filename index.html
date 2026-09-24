@@ -7,21 +7,29 @@
   <style>
     body {
       margin: 0;
+      overflow: hidden;
       background: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       font-family: monospace;
       color: #fff;
     }
     canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
       background: #5c94fc;
-      border: 2px solid #fff;
+      border: none;
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<div id="letter-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 10;">
+  <div style="width: 80vw; max-width: 800px; height: 80vh; max-height: 800px; background: #f4e3c5; border: 8px solid #8B5A2B; padding: 40px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+    <p id="letter-text" style="font-family: 'Press Start 2P', monospace; font-size: 18px; line-height: 2; color: #333; overflow-y: auto; margin: 0;"></p>
+    <button id="close-btn" style="font-family: 'Press Start 2P', monospace; font-size: 18px; padding: 20px; cursor: pointer; background: #d2a679; border: 4px solid #8B5A2B;">CLOSE</button>
+  </div>
+</div>
 
 <canvas id="game" width="800" height="400"></canvas>
 
@@ -59,17 +67,16 @@
     { x: 1700, y: 260, w: 150, h: 20 }
   ];
 
-const coins = [
-    { x: 335, y: 220, r: 8, collected: false, message: "Message 1 goes here." },
-    { x: 535, y: 160, r: 8, collected: false, message: "Message 2 goes here." },
-    { x: 900, y: 320, r: 8, collected: false, message: "Message 3 goes here." },
-    { x: 1045, y: 220, r: 8, collected: false, message: "Message 4 goes here." },
-    { x: 1235, y: 140, r: 8, collected: false, message: "Message 5 goes here." },
-    { x: 1765, y: 220, r: 8, collected: false, message: "Message 6 goes here." }
-  ];
+  let isPaused = false;
 
-  let currentMessage = "";
-  let messageFrames = 0;
+  const coins = [
+    { x: 335, y: 220, r: 8, collected: false, message: "lorem ipsum dolor sit amet consectetur adipiscing elit qui ipsum qui nostrud nam nisi omnis molestias id irure voluptate culpa elit nisi praesentium dolores nam sint maxime minus qui consequatur fugiat omnis in distinctio incididunt esse animi in deserunt repellendus tempor qui fugiat qui provident qui officia nam duis possimus harum eiusmod id id et ullamco vel facere laboris temporibus ut et elit harum quod voluptate est excepteur id cillum atque eu facilis amet est cillum non consequatur distinctio sit voluptatum ea quo quod facere lorem tempore dolore lorem vel officia sed id et occaecat distinctio eu animi et dolor in mollit officia fuga dolore elit assumenda non aute repellendus quidem ducimus dolor aliquip velit laboris cupidatat eiusmod sunt est fuga excepturi placeat nostrud elit in voluptas est aute est officia irure assumenda minim ea animi sed velit illum velit odio soluta deleniti quas autem esse sunt expedita amet laborum ducimus dolore animi id enim dolor illum incididunt sint in ut quas nisi excepturi reprehenderit eu culpa est possimus facilis eiusmod enim corrupti ullamco veniam eos cupidatat distinctio animi iusto molestias omnis animi deserunt eiusmod duis amet laborum ut eum ex minus dignissimos quas non quis expedita assumenda soluta aute" },
+    { x: 535, y: 160, r: 8, collected: false, message: "Letter 2 content here." },
+    { x: 900, y: 320, r: 8, collected: false, message: "Letter 3 content here." },
+    { x: 1045, y: 220, r: 8, collected: false, message: "Letter 4 content here." },
+    { x: 1235, y: 140, r: 8, collected: false, message: "Letter 5 content here." },
+    { x: 1765, y: 220, r: 8, collected: false, message: "Letter 6 content here." }
+  ];
 
   const flag = { x: 2200, y: 160, w: 10, h: 200, flagW: 40, flagH: 30 };
 
@@ -85,6 +92,7 @@ const coins = [
 
   function update() {
     if (player.won) return;
+    if (isPaused) return;
 
     if (keys['ArrowRight'] || keys['KeyD']) player.vx = 4;
     else if (keys['ArrowLeft'] || keys['KeyA']) player.vx = -4;
@@ -125,8 +133,9 @@ const coins = [
       ) {
         c.collected = true;
         player.score += 10;
-        currentMessage = c.message;
-        messageFrames = 180;
+        document.getElementById('letter-text').innerText = c.message;
+        document.getElementById('letter-overlay').style.display = 'flex';
+        isPaused = true;
       }
     }
 
@@ -138,8 +147,10 @@ const coins = [
       reset();
     }
   }
-const cakeImg = new Image();
-cakeImg.src = 'asset/cake.png';
+
+  const cakeImg = new Image();
+  cakeImg.src = 'asset/cake.png';
+
   function draw() {
     let cameraX = Math.max(0, Math.min(player.x - canvas.width / 3, levelWidth - canvas.width));
 
@@ -174,23 +185,14 @@ cakeImg.src = 'asset/cake.png';
 
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '20px monospace';
+    ctx.textAlign = 'left';
     ctx.fillText(`COINS: ${player.score}`, 20, 30);
-
-    if (messageFrames > 0) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      ctx.fillRect(canvas.width / 2 - 250, canvas.height / 2 - 50, 500, 100);
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = '18px monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(currentMessage, canvas.width / 2, canvas.height / 2);
-      messageFrames--;
-    }
 
     if (player.won) {
       ctx.fillStyle = '#00FF00';
       ctx.font = '36px monospace';
-      ctx.fillText('STAGE CLEAR', canvas.width / 2 - 120, canvas.height / 2);
+      ctx.textAlign = 'center';
+      ctx.fillText('STAGE CLEAR', canvas.width / 2, canvas.height / 2);
     }
   }
 
@@ -201,6 +203,11 @@ cakeImg.src = 'asset/cake.png';
   }
 
   loop();
+
+  document.getElementById('close-btn').addEventListener('click', () => {
+    document.getElementById('letter-overlay').style.display = 'none';
+    isPaused = false;
+  });
 </script>
 </body>
 </html>
