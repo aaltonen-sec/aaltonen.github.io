@@ -59,14 +59,17 @@
     { x: 1700, y: 260, w: 150, h: 20 }
   ];
 
-  const coins = [
-    { x: 335, y: 220, r: 8, collected: false },
-    { x: 535, y: 160, r: 8, collected: false },
-    { x: 900, y: 320, r: 8, collected: false },
-    { x: 1045, y: 220, r: 8, collected: false },
-    { x: 1235, y: 140, r: 8, collected: false },
-    { x: 1765, y: 220, r: 8, collected: false }
+const coins = [
+    { x: 335, y: 220, r: 8, collected: false, message: "Message 1 goes here." },
+    { x: 535, y: 160, r: 8, collected: false, message: "Message 2 goes here." },
+    { x: 900, y: 320, r: 8, collected: false, message: "Message 3 goes here." },
+    { x: 1045, y: 220, r: 8, collected: false, message: "Message 4 goes here." },
+    { x: 1235, y: 140, r: 8, collected: false, message: "Message 5 goes here." },
+    { x: 1765, y: 220, r: 8, collected: false, message: "Message 6 goes here." }
   ];
+
+  let currentMessage = "";
+  let messageFrames = 0;
 
   const flag = { x: 2200, y: 160, w: 10, h: 200, flagW: 40, flagH: 30 };
 
@@ -122,6 +125,8 @@
       ) {
         c.collected = true;
         player.score += 10;
+        currentMessage = c.message;
+        messageFrames = 180;
       }
     }
 
@@ -170,6 +175,17 @@ cakeImg.src = 'asset/cake.png';
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '20px monospace';
     ctx.fillText(`COINS: ${player.score}`, 20, 30);
+
+    if (messageFrames > 0) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillRect(canvas.width / 2 - 250, canvas.height / 2 - 50, 500, 100);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '18px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(currentMessage, canvas.width / 2, canvas.height / 2);
+      messageFrames--;
+    }
 
     if (player.won) {
       ctx.fillStyle = '#00FF00';
